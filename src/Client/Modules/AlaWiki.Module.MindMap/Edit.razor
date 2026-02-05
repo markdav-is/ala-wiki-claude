@@ -1,0 +1,279 @@
+@using Oqtane.Modules
+@using AlaWiki.Module.MindMap.Shared.Models
+@using AlaWiki.Module.MindMap.Shared.Interfaces
+@namespace AlaWiki.Module.MindMap.Client.Modules
+@inherits ModuleBase
+@inject IWikiConnectionService WikiConnectionService
+@inject NavigationManager NavigationManager
+
+<div class="container-fluid">
+    <h3>Wiki Connections</h3>
+    <p class="text-muted">Manage connections to Azure DevOps wiki repositories.</p>
+
+    @if (_loading)
+    {
+        <div class="d-flex justify-content-center my-4">
+            <div class="spinner-border" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="mb-4">
+            <button class="btn btn-primary" @onclick="ShowAddConnection">
+                <i class="oi oi-plus"></i> Add Wiki Connection
+            </button>
+        </div>
+
+        @if (_connections.Count == 0)
+        {
+            <div class="alert alert-info">
+                No wiki connections configured. Click "Add Wiki Connection" to get started.
+            </div>
+        }
+        else
+        {
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Git URL</th>
+                        <th>Branch</th>
+                        <th>Last Synced</th>
+                        <th>Active</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var connection in _connections)
+                    {
+                        <tr>
+                            <td>@connection.Name</td>
+                            <td><code>@TruncateUrl(connection.GitUrl)</code></td>
+                            <td>@connection.DefaultBranch</td>
+                            <td>@(connection.LastSyncedOn?.ToString("g") ?? "Never")</td>
+                            <td>
+                                @if (connection.IsActive)
+                                {
+                                    <span class="badge bg-success">Active</span>
+                                }
+                                else
+                                {
+                                    <span class="badge bg-secondary">Inactive</span>
+                                }
+                            </td>
+                            <td>
+                                <div class="btn-group btn-group-sm">
+                                    <button class="btn btn-outline-primary" @onclick="() => EditConnection(connection)">
+                                        <i class="oi oi-pencil"></i>
+                                    </button>
+                                    <button class="btn btn-outline-secondary" @onclick="() => SyncConnection(connection)">
+                                        <i class="oi oi-reload"></i>
+                                    </button>
+                                    <button class="btn btn-outline-info" @onclick="() => TestConnection(connection)">
+                                        <i class="oi oi-check"></i>
+                                    </button>
+                                    <button class="btn btn-outline-danger" @onclick="() => DeleteConnection(connection)">
+                                        <i class="oi oi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+
+        @if (_showForm)
+        {
+            <div class="card mt-4">
+                <div class="card-header">
+                    <h5>@(_editingConnection?.WikiConnectionId > 0 ? "Edit" : "Add") Wiki Connection</h5>
+                </div>
+                <div class="card-body">
+                    <EditForm Model="_editingConnection" OnValidSubmit="SaveConnection">
+                        <DataAnnotationsValidator />
+                        <ValidationSummary class="text-danger" />
+
+                        <div class="mb-3">
+                            <label class="form-label">Name *</label>
+                            <InputText class="form-control" @bind-Value="_editingConnection!.Name" />
+                            <div class="form-text">A friendly name for this wiki connection.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Git URL *</label>
+                            <InputText class="form-control" @bind-Value="_editingConnection!.GitUrl"
+                                       placeholder="https://dev.azure.com/org/project/_git/project.wiki" />
+                            <div class="form-text">The Git clone URL for your Azure DevOps wiki.</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Branch</label>
+                            <InputText class="form-control" @bind-Value="_editingConnection!.DefaultBranch" />
+                            <div class="form-text">Default: wikiMaster (standard for ADO wikis)</div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label class="form-label">Personal Access Token</label>
+                            <InputText type="password" class="form-control" @bind-Value="_editingConnection!.PersonalAccessToken" />
+                            <div class="form-text">PAT with Code (Read) permissions. Required for private wikis.</div>
+                        </div>
+
+                        <div class="mb-3 form-check">
+                            <InputCheckbox class="form-check-input" @bind-Value="_editingConnection!.IsActive" id="isActive" />
+                            <label class="form-check-label" for="isActive">Active (use this wiki for mind map)</label>
+                        </div>
+
+                        <div class="d-flex gap-2">
+                            <button type="submit" class="btn btn-primary">Save</button>
+                            <button type="button" class="btn btn-secondary" @onclick="CancelEdit">Cancel</button>
+                        </div>
+                    </EditForm>
+                </div>
+            </div>
+        }
+    }
+</div>
+
+@code {
+    private bool _loading = true;
+    private bool _showForm;
+    private List<WikiConnection> _connections = [];
+    private WikiConnection? _editingConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadConnections();
+    }
+
+    private async Task LoadConnections()
+    {
+        _loading = true;
+        try
+        {
+            _connections = await WikiConnectionService.GetWikiConnectionsAsync(ModuleState.ModuleId);
+        }
+        catch (Exception ex)
+        {
+            AddModuleMessage($"Error loading connections: {ex.Message}", MessageType.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private void ShowAddConnection()
+    {
+        _editingConnection = new WikiConnection
+        {
+            ModuleId = ModuleState.ModuleId,
+            DefaultBranch = "wikiMaster",
+            IsActive = true
+        };
+        _showForm = true;
+    }
+
+    private void EditConnection(WikiConnection connection)
+    {
+        _editingConnection = new WikiConnection
+        {
+            WikiConnectionId = connection.WikiConnectionId,
+            ModuleId = connection.ModuleId,
+            Name = connection.Name,
+            GitUrl = connection.GitUrl,
+            DefaultBranch = connection.DefaultBranch,
+            PersonalAccessToken = connection.PersonalAccessToken,
+            IsActive = connection.IsActive
+        };
+        _showForm = true;
+    }
+
+    private void CancelEdit()
+    {
+        _editingConnection = null;
+        _showForm = false;
+    }
+
+    private async Task SaveConnection()
+    {
+        if (_editingConnection == null) return;
+
+        try
+        {
+            if (_editingConnection.WikiConnectionId > 0)
+            {
+                await WikiConnectionService.UpdateWikiConnectionAsync(_editingConnection);
+                AddModuleMessage("Connection updated successfully.", MessageType.Success);
+            }
+            else
+            {
+                await WikiConnectionService.AddWikiConnectionAsync(_editingConnection);
+                AddModuleMessage("Connection added successfully.", MessageType.Success);
+            }
+
+            _showForm = false;
+            _editingConnection = null;
+            await LoadConnections();
+        }
+        catch (Exception ex)
+        {
+            AddModuleMessage($"Error saving connection: {ex.Message}", MessageType.Error);
+        }
+    }
+
+    private async Task DeleteConnection(WikiConnection connection)
+    {
+        try
+        {
+            await WikiConnectionService.DeleteWikiConnectionAsync(connection.WikiConnectionId);
+            AddModuleMessage("Connection deleted.", MessageType.Success);
+            await LoadConnections();
+        }
+        catch (Exception ex)
+        {
+            AddModuleMessage($"Error deleting connection: {ex.Message}", MessageType.Error);
+        }
+    }
+
+    private async Task SyncConnection(WikiConnection connection)
+    {
+        try
+        {
+            await WikiConnectionService.SyncWikiAsync(connection.WikiConnectionId);
+            AddModuleMessage("Wiki synchronized successfully.", MessageType.Success);
+            await LoadConnections();
+        }
+        catch (Exception ex)
+        {
+            AddModuleMessage($"Error syncing wiki: {ex.Message}", MessageType.Error);
+        }
+    }
+
+    private async Task TestConnection(WikiConnection connection)
+    {
+        try
+        {
+            var success = await WikiConnectionService.TestConnectionAsync(connection.WikiConnectionId);
+            if (success)
+            {
+                AddModuleMessage("Connection test successful!", MessageType.Success);
+            }
+            else
+            {
+                AddModuleMessage("Connection test failed.", MessageType.Warning);
+            }
+        }
+        catch (Exception ex)
+        {
+            AddModuleMessage($"Connection test error: {ex.Message}", MessageType.Error);
+        }
+    }
+
+    private string TruncateUrl(string url)
+    {
+        return url.Length > 50 ? url[..47] + "..." : url;
+    }
+}

@@ -1,0 +1,195 @@
+@using Oqtane.Modules
+@using AlaWiki.Module.MindMap.Shared.Models
+@using AlaWiki.Module.MindMap.Shared.Interfaces
+@namespace AlaWiki.Module.MindMap.Client.Modules
+@inherits ModuleBase
+@inject IMindMapService MindMapService
+@inject IWikiConnectionService WikiConnectionService
+@inject NavigationManager NavigationManager
+
+<div class="ala-wiki-container">
+    @if (_loading)
+    {
+        <div class="ala-wiki-loading">
+            <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Loading...</span>
+            </div>
+            <p>Loading mind map...</p>
+        </div>
+    }
+    else if (_wikiConnection == null)
+    {
+        <div class="ala-wiki-setup">
+            <div class="alert alert-info">
+                <h4>Welcome to AlaWiki</h4>
+                <p>No wiki connection configured. Please configure a connection to your Azure DevOps wiki.</p>
+                @if (UserSecurity.IsAuthorized(PageState.User, PermissionNames.Edit, ModuleState.PermissionList))
+                {
+                    <button class="btn btn-primary" @onclick="NavigateToSettings">
+                        Configure Wiki Connection
+                    </button>
+                }
+            </div>
+        </div>
+    }
+    else if (_mindMap?.Root != null)
+    {
+        <div class="ala-wiki-toolbar">
+            <div class="btn-group" role="group">
+                <button class="btn btn-outline-secondary btn-sm" @onclick="ZoomIn" title="Zoom In">
+                    <i class="oi oi-zoom-in"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="ZoomOut" title="Zoom Out">
+                    <i class="oi oi-zoom-out"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="ResetView" title="Reset View">
+                    <i class="oi oi-home"></i>
+                </button>
+            </div>
+            <div class="btn-group ms-2" role="group">
+                <button class="btn btn-outline-secondary btn-sm" @onclick="ExpandAll" title="Expand All">
+                    <i class="oi oi-expand-down"></i>
+                </button>
+                <button class="btn btn-outline-secondary btn-sm" @onclick="CollapseAll" title="Collapse All">
+                    <i class="oi oi-collapse-up"></i>
+                </button>
+            </div>
+            <div class="ms-auto">
+                <button class="btn btn-outline-primary btn-sm" @onclick="RefreshMindMap" title="Refresh">
+                    <i class="oi oi-reload"></i> Refresh
+                </button>
+            </div>
+        </div>
+
+        <div class="ala-wiki-canvas"
+             style="transform: scale(@_zoom); transform-origin: top left;"
+             @onmousedown="OnMouseDown"
+             @onmousemove="OnMouseMove"
+             @onmouseup="OnMouseUp">
+            <MindMapView Node="_mindMap.Root"
+                         OnNodeClick="OnNodeClick"
+                         OnNodeToggle="OnNodeToggle" />
+        </div>
+
+        @if (_selectedNode != null)
+        {
+            <div class="ala-wiki-sidebar">
+                <NodeDetails Node="_selectedNode"
+                             OnClose="CloseNodeDetails"
+                             OnMetadataChange="OnMetadataChange" />
+            </div>
+        }
+    }
+    else
+    {
+        <div class="alert alert-warning">
+            <p>Unable to load mind map. The wiki may be empty or there was an error loading content.</p>
+            <button class="btn btn-secondary" @onclick="RefreshMindMap">Try Again</button>
+        </div>
+    }
+</div>
+
+@code {
+    private bool _loading = true;
+    private WikiConnection? _wikiConnection;
+    private MindMap? _mindMap;
+    private MindMapNode? _selectedNode;
+    private double _zoom = 1.0;
+    private bool _isDragging;
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMindMap();
+    }
+
+    private async Task LoadMindMap()
+    {
+        try
+        {
+            _loading = true;
+            var connections = await WikiConnectionService.GetWikiConnectionsAsync(ModuleState.ModuleId);
+            _wikiConnection = connections.FirstOrDefault(c => c.IsActive);
+
+            if (_wikiConnection != null)
+            {
+                _mindMap = await MindMapService.GenerateMindMapAsync(_wikiConnection.WikiConnectionId);
+            }
+        }
+        catch (Exception ex)
+        {
+            AddModuleMessage($"Error loading mind map: {ex.Message}", MessageType.Error);
+        }
+        finally
+        {
+            _loading = false;
+        }
+    }
+
+    private async Task RefreshMindMap()
+    {
+        if (_wikiConnection != null)
+        {
+            await WikiConnectionService.SyncWikiAsync(_wikiConnection.WikiConnectionId);
+        }
+        await LoadMindMap();
+    }
+
+    private void NavigateToSettings()
+    {
+        NavigationManager.NavigateTo(EditUrl());
+    }
+
+    private void OnNodeClick(MindMapNode node)
+    {
+        _selectedNode = node;
+        StateHasChanged();
+    }
+
+    private void OnNodeToggle(MindMapNode node)
+    {
+        node.IsCollapsed = !node.IsCollapsed;
+        StateHasChanged();
+    }
+
+    private void CloseNodeDetails()
+    {
+        _selectedNode = null;
+    }
+
+    private async Task OnMetadataChange(NodeMetadata metadata)
+    {
+        if (_wikiConnection != null && _selectedNode != null)
+        {
+            await MindMapService.UpdateNodeMetadataAsync(
+                _wikiConnection.WikiConnectionId,
+                _selectedNode.WikiPath,
+                metadata);
+            await RefreshMindMap();
+        }
+    }
+
+    private void ZoomIn() => _zoom = Math.Min(_zoom + 0.1, 2.0);
+    private void ZoomOut() => _zoom = Math.Max(_zoom - 0.1, 0.3);
+    private void ResetView() => _zoom = 1.0;
+
+    private void ExpandAll() => SetCollapsedState(_mindMap?.Root, false);
+    private void CollapseAll() => SetCollapsedState(_mindMap?.Root, true);
+
+    private void SetCollapsedState(MindMapNode? node, bool collapsed)
+    {
+        if (node == null) return;
+        node.IsCollapsed = collapsed;
+        foreach (var child in node.Children)
+        {
+            SetCollapsedState(child, collapsed);
+        }
+        StateHasChanged();
+    }
+
+    private void OnMouseDown(MouseEventArgs e) => _isDragging = true;
+    private void OnMouseUp(MouseEventArgs e) => _isDragging = false;
+    private void OnMouseMove(MouseEventArgs e)
+    {
+        // Pan handling would go here
+    }
+}

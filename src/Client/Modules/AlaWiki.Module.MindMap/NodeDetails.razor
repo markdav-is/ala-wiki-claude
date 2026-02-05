@@ -1,0 +1,144 @@
+@using AlaWiki.Module.MindMap.Shared.Models
+@namespace AlaWiki.Module.MindMap.Client.Modules
+
+<div class="node-details-panel">
+    <div class="node-details-header">
+        <h5>@Node.Label</h5>
+        <button class="btn-close" @onclick="() => OnClose.InvokeAsync()"></button>
+    </div>
+
+    <div class="node-details-body">
+        <div class="mb-3">
+            <label class="form-label">Wiki Path</label>
+            <input type="text" class="form-control form-control-sm" value="@Node.WikiPath" readonly />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Custom Label</label>
+            <input type="text" class="form-control form-control-sm"
+                   @bind="_metadata.Label"
+                   placeholder="Override display label" />
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Color</label>
+            <div class="input-group input-group-sm">
+                <input type="color" class="form-control form-control-color"
+                       @bind="_metadata.Color" />
+                <input type="text" class="form-control"
+                       @bind="_metadata.Color"
+                       placeholder="#ffffff" />
+            </div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Icon</label>
+            <select class="form-select form-select-sm" @bind="_metadata.Icon">
+                <option value="">None</option>
+                <option value="oi oi-file">Document</option>
+                <option value="oi oi-folder">Folder</option>
+                <option value="oi oi-code">Code</option>
+                <option value="oi oi-cog">Settings</option>
+                <option value="oi oi-people">Team</option>
+                <option value="oi oi-bug">Bug</option>
+                <option value="oi oi-lightbulb">Idea</option>
+                <option value="oi oi-task">Task</option>
+                <option value="oi oi-star">Star</option>
+                <option value="oi oi-warning">Warning</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Shape</label>
+            <select class="form-select form-select-sm" @bind="_metadata.Shape">
+                <option value="rounded">Rounded</option>
+                <option value="rectangle">Rectangle</option>
+                <option value="ellipse">Ellipse</option>
+                <option value="diamond">Diamond</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Priority</label>
+            <select class="form-select form-select-sm" @bind="_metadata.Priority">
+                <option value="">None</option>
+                <option value="1">1 - Critical</option>
+                <option value="2">2 - High</option>
+                <option value="3">3 - Medium</option>
+                <option value="4">4 - Low</option>
+                <option value="5">5 - Minimal</option>
+            </select>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Tags</label>
+            <input type="text" class="form-control form-control-sm"
+                   @bind="_tagsInput"
+                   placeholder="Comma-separated tags" />
+            <div class="form-text">e.g., architecture, security, api</div>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Notes</label>
+            <textarea class="form-control form-control-sm"
+                      rows="3"
+                      @bind="_metadata.Notes"
+                      placeholder="Additional notes for tooltip"></textarea>
+        </div>
+
+        <div class="mb-3 form-check">
+            <input type="checkbox" class="form-check-input"
+                   id="collapsed"
+                   @bind="_metadata.Collapsed" />
+            <label class="form-check-label" for="collapsed">Collapsed by default</label>
+        </div>
+    </div>
+
+    <div class="node-details-footer">
+        <button class="btn btn-primary btn-sm" @onclick="SaveChanges">
+            Save Changes
+        </button>
+        <button class="btn btn-outline-secondary btn-sm" @onclick="() => OnClose.InvokeAsync()">
+            Cancel
+        </button>
+    </div>
+</div>
+
+@code {
+    [Parameter]
+    public MindMapNode Node { get; set; } = new();
+
+    [Parameter]
+    public EventCallback OnClose { get; set; }
+
+    [Parameter]
+    public EventCallback<NodeMetadata> OnMetadataChange { get; set; }
+
+    private NodeMetadata _metadata = new();
+    private string _tagsInput = string.Empty;
+
+    protected override void OnParametersSet()
+    {
+        _metadata = new NodeMetadata
+        {
+            Path = Node.WikiPath,
+            Label = Node.Label != Node.WikiPath ? Node.Label : null,
+            Color = Node.Style.BackgroundColor != "#ffffff" ? Node.Style.BackgroundColor : null,
+            Icon = Node.Style.Icon,
+            Shape = Node.Style.Shape,
+            Collapsed = Node.IsCollapsed,
+            Tags = new List<string>(Node.Tags),
+            Notes = Node.Tooltip
+        };
+        _tagsInput = string.Join(", ", _metadata.Tags);
+    }
+
+    private async Task SaveChanges()
+    {
+        _metadata.Tags = _tagsInput
+            .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .ToList();
+
+        await OnMetadataChange.InvokeAsync(_metadata);
+    }
+}

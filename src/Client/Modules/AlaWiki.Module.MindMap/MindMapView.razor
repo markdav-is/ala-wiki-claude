@@ -1,0 +1,100 @@
+@using AlaWiki.Module.MindMap.Shared.Models
+@namespace AlaWiki.Module.MindMap.Client.Modules
+
+<div class="mindmap-node-container">
+    <div class="mindmap-node @GetNodeClasses()"
+         style="@GetNodeStyle()"
+         @onclick="() => OnNodeClick.InvokeAsync(Node)"
+         @onclick:stopPropagation="true">
+
+        @if (Node.Children.Count > 0)
+        {
+            <button class="mindmap-toggle" @onclick="() => OnNodeToggle.InvokeAsync(Node)" @onclick:stopPropagation="true">
+                @if (Node.IsCollapsed)
+                {
+                    <span>+</span>
+                }
+                else
+                {
+                    <span>−</span>
+                }
+            </button>
+        }
+
+        @if (!string.IsNullOrEmpty(Node.Style.Icon))
+        {
+            <span class="mindmap-icon">
+                <i class="@Node.Style.Icon"></i>
+            </span>
+        }
+
+        <span class="mindmap-label">@Node.Label</span>
+
+        @if (Node.Tags.Count > 0)
+        {
+            <div class="mindmap-tags">
+                @foreach (var tag in Node.Tags.Take(3))
+                {
+                    <span class="badge bg-secondary">@tag</span>
+                }
+            </div>
+        }
+    </div>
+
+    @if (!Node.IsCollapsed && Node.Children.Count > 0)
+    {
+        <div class="mindmap-children">
+            <svg class="mindmap-connectors" width="40" height="@(Node.Children.Count * 60)">
+                @for (int i = 0; i < Node.Children.Count; i++)
+                {
+                    var yPos = (i * 60) + 30;
+                    <path d="M 0,@(Node.Children.Count * 30) Q 20,@(Node.Children.Count * 30) 20,@yPos L 40,@yPos"
+                          stroke="#ccc"
+                          stroke-width="2"
+                          fill="none" />
+                }
+            </svg>
+            <div class="mindmap-children-nodes">
+                @foreach (var child in Node.Children)
+                {
+                    <MindMapView Node="child"
+                                 OnNodeClick="OnNodeClick"
+                                 OnNodeToggle="OnNodeToggle" />
+                }
+            </div>
+        </div>
+    }
+</div>
+
+@code {
+    [Parameter]
+    public MindMapNode Node { get; set; } = new();
+
+    [Parameter]
+    public EventCallback<MindMapNode> OnNodeClick { get; set; }
+
+    [Parameter]
+    public EventCallback<MindMapNode> OnNodeToggle { get; set; }
+
+    private string GetNodeClasses()
+    {
+        var classes = new List<string> { $"shape-{Node.Style.Shape}" };
+
+        if (Node.IsCollapsed && Node.Children.Count > 0)
+        {
+            classes.Add("has-collapsed-children");
+        }
+
+        return string.Join(" ", classes);
+    }
+
+    private string GetNodeStyle()
+    {
+        return $"background-color: {Node.Style.BackgroundColor}; " +
+               $"border-color: {Node.Style.BorderColor}; " +
+               $"color: {Node.Style.TextColor}; " +
+               $"border-width: {Node.Style.BorderWidth}px; " +
+               $"padding: {Node.Style.Padding}px; " +
+               $"font-size: {Node.Style.FontSize}px;";
+    }
+}

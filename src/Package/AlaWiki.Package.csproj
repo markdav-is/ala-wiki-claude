@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <PackageId>AlaWiki</PackageId>
+    <Version>1.0.0</Version>
+    <Authors>Mark Davis</Authors>
+    <Company>AlaWiki</Company>
+    <Description>Mind-mapping extension for Azure DevOps wikis - Oqtane Module</Description>
+    <PackageTags>oqtane;module;mindmap;wiki;azure-devops</PackageTags>
+    <RepositoryUrl>https://github.com/markdav-is/ala-wiki</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/markdav-is/ala-wiki</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client\AlaWiki.Client.csproj" />
+    <ProjectReference Include="..\Server\AlaWiki.Server.csproj" />
+    <ProjectReference Include="..\Shared\AlaWiki.Shared.csproj" />
+  </ItemGroup>
+
+  <Target Name="CreateOqtanePackage" AfterTargets="Build" Condition="'$(Configuration)' == 'Release'">
+    <ItemGroup>
+      <PackageFiles Include="$(OutputPath)\AlaWiki.*.dll" />
+      <PackageFiles Include="$(OutputPath)\LibGit2Sharp.dll" />
+    </ItemGroup>
+    <Copy SourceFiles="@(PackageFiles)" DestinationFolder="$(OutputPath)\package" />
+    <ZipDirectory SourceDirectory="$(OutputPath)\package" DestinationFile="$(OutputPath)\AlaWiki.$(Version).oqp" Overwrite="true" />
+  </Target>
+
+</Project>

@@ -1,0 +1,242 @@
+/* AlaWiki Mind Map Module Styles */
+
+.ala-wiki-container {
+    position: relative;
+    width: 100%;
+    min-height: 500px;
+    display: flex;
+    flex-direction: column;
+}
+
+.ala-wiki-loading {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 1rem;
+}
+
+.ala-wiki-setup {
+    padding: 2rem;
+}
+
+.ala-wiki-toolbar {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    background: #f8f9fa;
+    border-bottom: 1px solid #dee2e6;
+    gap: 0.5rem;
+}
+
+.ala-wiki-canvas {
+    flex: 1;
+    overflow: auto;
+    padding: 2rem;
+    background: linear-gradient(90deg, #f0f0f0 1px, transparent 1px) 0 0 / 20px 20px,
+                linear-gradient(#f0f0f0 1px, transparent 1px) 0 0 / 20px 20px;
+    background-color: #fafafa;
+}
+
+.ala-wiki-sidebar {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 320px;
+    background: white;
+    border-left: 1px solid #dee2e6;
+    box-shadow: -2px 0 8px rgba(0, 0, 0, 0.1);
+    overflow-y: auto;
+    z-index: 100;
+}
+
+/* Mind Map Node Styles */
+.mindmap-node-container {
+    display: flex;
+    align-items: flex-start;
+    margin: 0.25rem 0;
+}
+
+.mindmap-node {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    border: 2px solid #333;
+    border-radius: 8px;
+    background: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 120px;
+    max-width: 300px;
+    position: relative;
+}
+
+.mindmap-node:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    transform: translateY(-1px);
+}
+
+.mindmap-node.shape-rectangle {
+    border-radius: 0;
+}
+
+.mindmap-node.shape-ellipse {
+    border-radius: 50px;
+}
+
+.mindmap-node.shape-rounded {
+    border-radius: 8px;
+}
+
+.mindmap-node.shape-diamond {
+    transform: rotate(45deg);
+}
+
+.mindmap-node.shape-diamond > * {
+    transform: rotate(-45deg);
+}
+
+.mindmap-node.has-collapsed-children::after {
+    content: '...';
+    position: absolute;
+    right: -20px;
+    color: #666;
+    font-weight: bold;
+}
+
+.mindmap-toggle {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    border: 1px solid #ccc;
+    border-radius: 50%;
+    background: white;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    margin-left: -8px;
+    margin-right: 4px;
+}
+
+.mindmap-toggle:hover {
+    background: #e9ecef;
+}
+
+.mindmap-icon {
+    font-size: 1.1em;
+}
+
+.mindmap-label {
+    font-weight: 500;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.mindmap-tags {
+    display: flex;
+    gap: 0.25rem;
+    margin-left: auto;
+}
+
+.mindmap-tags .badge {
+    font-size: 0.65rem;
+    padding: 0.15rem 0.35rem;
+}
+
+.mindmap-children {
+    display: flex;
+    align-items: flex-start;
+    margin-left: 1rem;
+}
+
+.mindmap-connectors {
+    flex-shrink: 0;
+}
+
+.mindmap-children-nodes {
+    display: flex;
+    flex-direction: column;
+}
+
+/* Node Details Panel */
+.node-details-panel {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.node-details-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem;
+    border-bottom: 1px solid #dee2e6;
+    background: #f8f9fa;
+}
+
+.node-details-header h5 {
+    margin: 0;
+    font-size: 1rem;
+}
+
+.node-details-body {
+    flex: 1;
+    padding: 1rem;
+    overflow-y: auto;
+}
+
+.node-details-footer {
+    padding: 1rem;
+    border-top: 1px solid #dee2e6;
+    display: flex;
+    gap: 0.5rem;
+}
+
+/* Dark theme overrides */
+.theme-dark .ala-wiki-canvas {
+    background-color: #1a1a2e;
+    background-image: linear-gradient(90deg, #2a2a4e 1px, transparent 1px),
+                      linear-gradient(#2a2a4e 1px, transparent 1px);
+}
+
+.theme-dark .mindmap-node {
+    background: #2a2a4e;
+    border-color: #4a4a6e;
+    color: #e0e0e0;
+}
+
+.theme-dark .ala-wiki-toolbar {
+    background: #1a1a2e;
+    border-color: #2a2a4e;
+}
+
+/* Colorful theme */
+.theme-colorful .mindmap-node:nth-child(6n+1) { border-color: #e74c3c; }
+.theme-colorful .mindmap-node:nth-child(6n+2) { border-color: #3498db; }
+.theme-colorful .mindmap-node:nth-child(6n+3) { border-color: #2ecc71; }
+.theme-colorful .mindmap-node:nth-child(6n+4) { border-color: #9b59b6; }
+.theme-colorful .mindmap-node:nth-child(6n+5) { border-color: #f39c12; }
+.theme-colorful .mindmap-node:nth-child(6n+6) { border-color: #1abc9c; }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .ala-wiki-sidebar {
+        width: 100%;
+        height: 50%;
+        top: auto;
+        border-left: none;
+        border-top: 1px solid #dee2e6;
+    }
+
+    .mindmap-node {
+        min-width: 80px;
+        padding: 0.35rem 0.75rem;
+        font-size: 0.875rem;
+    }
+}

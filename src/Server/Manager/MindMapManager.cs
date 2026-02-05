@@ -4,17 +4,17 @@ using Oqtane.Models;
 using Oqtane.Modules;
 using Oqtane.Repository;
 using Oqtane.Shared;
-using AlaWiki.Shared.Models;
-using AlaWiki.Server.Repository;
+using AlaWiki.Module.MindMap.Shared.Models;
+using AlaWiki.Module.MindMap.Server.Repository;
 
-namespace AlaWiki.Server.Manager;
+namespace AlaWiki.Module.MindMap.Server.Manager;
 
-public class AlaWikiManager : IInstallable, IPortable
+public class MindMapManager : IInstallable, IPortable
 {
     private readonly ISqlRepository _sql;
     private readonly IWikiConnectionRepository _repository;
 
-    public AlaWikiManager(ISqlRepository sql, IWikiConnectionRepository repository)
+    public MindMapManager(ISqlRepository sql, IWikiConnectionRepository repository)
     {
         _sql = sql;
         _repository = repository;
@@ -22,12 +22,12 @@ public class AlaWikiManager : IInstallable, IPortable
 
     public bool Install(Tenant tenant, string version)
     {
-        return _sql.ExecuteScript(tenant, GetType().Assembly, "AlaWiki." + version + ".sql");
+        return _sql.ExecuteScript(tenant, GetType().Assembly, "AlaWiki.Module.MindMap." + version + ".sql");
     }
 
     public bool Uninstall(Tenant tenant)
     {
-        return _sql.ExecuteScript(tenant, GetType().Assembly, "AlaWiki.Uninstall.sql");
+        return _sql.ExecuteScript(tenant, GetType().Assembly, "AlaWiki.Module.MindMap.Uninstall.sql");
     }
 
     public string ExportModule(Module module)

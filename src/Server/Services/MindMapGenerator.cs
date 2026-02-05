@@ -1,6 +1,6 @@
-using AlaWiki.Shared.Models;
+using AlaWiki.Module.MindMap.Shared.Models;
 
-namespace AlaWiki.Server.Services;
+namespace AlaWiki.Module.MindMap.Server.Services;
 
 public interface IMindMapGenerator
 {

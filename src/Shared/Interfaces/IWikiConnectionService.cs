@@ -1,6 +1,6 @@
-using AlaWiki.Shared.Models;
+using AlaWiki.Module.MindMap.Shared.Models;
 
-namespace AlaWiki.Shared.Interfaces;
+namespace AlaWiki.Module.MindMap.Shared.Interfaces;
 
 /// <summary>
 /// Service interface for managing wiki connections.

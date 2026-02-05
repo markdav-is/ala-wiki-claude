@@ -1,8 +1,8 @@
 using Microsoft.EntityFrameworkCore;
 using Oqtane.Modules;
-using AlaWiki.Shared.Models;
+using AlaWiki.Module.MindMap.Shared.Models;
 
-namespace AlaWiki.Server.Repository;
+namespace AlaWiki.Module.MindMap.Server.Repository;
 
 public interface IWikiConnectionRepository
 {
@@ -15,9 +15,9 @@ public interface IWikiConnectionRepository
 
 public class WikiConnectionRepository : IWikiConnectionRepository, ITransientService
 {
-    private readonly AlaWikiContext _db;
+    private readonly MindMapContext _db;
 
-    public WikiConnectionRepository(AlaWikiContext context)
+    public WikiConnectionRepository(MindMapContext context)
     {
         _db = context;
     }

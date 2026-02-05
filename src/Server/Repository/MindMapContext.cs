@@ -1,13 +1,13 @@
 using Microsoft.EntityFrameworkCore;
 using Oqtane.Databases.Interfaces;
 using Oqtane.Repository;
-using AlaWiki.Shared.Models;
+using AlaWiki.Module.MindMap.Shared.Models;
 
-namespace AlaWiki.Server.Repository;
+namespace AlaWiki.Module.MindMap.Server.Repository;
 
-public class AlaWikiContext : DBContextBase, ITransientService, IMultiDatabase
+public class MindMapContext : DBContextBase, ITransientService, IMultiDatabase
 {
-    public AlaWikiContext(IDBContextDependencies DBContextDependencies)
+    public MindMapContext(IDBContextDependencies DBContextDependencies)
         : base(DBContextDependencies) { }
 
     public virtual DbSet<WikiConnection> WikiConnections { get; set; } = null!;
@@ -18,7 +18,7 @@ public class AlaWikiContext : DBContextBase, ITransientService, IMultiDatabase
 
         modelBuilder.Entity<WikiConnection>(entity =>
         {
-            entity.ToTable("AlaWiki_WikiConnection");
+            entity.ToTable("AlaWikiMindMap_WikiConnection");
             entity.HasKey(e => e.WikiConnectionId);
             entity.HasIndex(e => e.ModuleId);
             entity.Property(e => e.Name).IsRequired().HasMaxLength(500);

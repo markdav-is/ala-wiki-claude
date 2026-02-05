@@ -1,0 +1,6 @@
+<Solution>
+  <Project Path="Client/AlaWiki.Module.MindMap.Client.csproj" />
+  <Project Path="Server/AlaWiki.Module.MindMap.Server.csproj" />
+  <Project Path="Shared/AlaWiki.Module.MindMap.Shared.csproj" />
+  <Project Path="Package/AlaWiki.Module.MindMap.Package.csproj" />
+</Solution>

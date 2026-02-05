@@ -1,4 +1,4 @@
-namespace AlaWiki.Shared.Models;
+namespace AlaWiki.Module.MindMap.Shared.Models;
 
 /// <summary>
 /// Represents a wiki page parsed from the Git repository.

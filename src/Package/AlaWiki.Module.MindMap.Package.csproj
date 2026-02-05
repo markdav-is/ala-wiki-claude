@@ -1,0 +1,36 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <Version>1.0.0</Version>
+    <Product>AlaWiki.Module.MindMap</Product>
+    <Authors>AlaWiki</Authors>
+    <Description>Mind-mapping extension for Azure DevOps wikis</Description>
+    <Copyright>AlaWiki</Copyright>
+    <PackageId>AlaWiki.Module.MindMap</PackageId>
+    <PackageIcon>icon.png</PackageIcon>
+    <RepositoryUrl>https://github.com/markdav-is/ala-wiki</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/markdav-is/ala-wiki</PackageProjectUrl>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    <AccelerateBuildsInVisualStudio>false</AccelerateBuildsInVisualStudio>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Client\AlaWiki.Module.MindMap.Client.csproj" />
+    <ProjectReference Include="..\Server\AlaWiki.Module.MindMap.Server.csproj" />
+    <ProjectReference Include="..\Shared\AlaWiki.Module.MindMap.Shared.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="icon.png" Pack="true" PackagePath="" />
+  </ItemGroup>
+
+  <Target Name="PostBuild" AfterTargets="PostBuildEvent">
+    <Exec Command="debug.cmd $(TargetFramework) $(ProjectName.Replace('.Package',''))" Condition="'$(Configuration)' == 'Debug' AND '$(OS)' == 'Windows_NT'" WorkingDirectory="$(ProjectDir)" />
+    <Exec Command="./debug.sh $(TargetFramework) $(ProjectName)" Condition="'$(Configuration)' == 'Debug' AND '$(OS)' != 'Windows_NT'" WorkingDirectory="$(ProjectDir)" />
+    <Exec Command="release.cmd $(TargetFramework) $(ProjectName.Replace('.Package',''))" Condition="'$(Configuration)' == 'Release' AND '$(OS)' == 'Windows_NT'" WorkingDirectory="$(ProjectDir)" />
+    <Exec Command="./release.sh $(TargetFramework) $(ProjectName)" Condition="'$(Configuration)' == 'Release' AND '$(OS)' != 'Windows_NT'" WorkingDirectory="$(ProjectDir)" />
+  </Target>
+
+</Project>

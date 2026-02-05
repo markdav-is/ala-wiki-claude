@@ -1,8 +1,8 @@
--- AlaWiki Module Database Migration v1.0.0
+-- AlaWiki.Module.MindMap Database Migration v1.0.0
 
-IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AlaWiki_WikiConnection]') AND type in (N'U'))
+IF NOT EXISTS (SELECT * FROM sys.objects WHERE object_id = OBJECT_ID(N'[dbo].[AlaWikiMindMap_WikiConnection]') AND type in (N'U'))
 BEGIN
-    CREATE TABLE [dbo].[AlaWiki_WikiConnection] (
+    CREATE TABLE [dbo].[AlaWikiMindMap_WikiConnection] (
         [WikiConnectionId] INT IDENTITY(1,1) NOT NULL,
         [ModuleId] INT NOT NULL,
         [Name] NVARCHAR(500) NOT NULL,
@@ -16,14 +16,14 @@ BEGIN
         [CreatedOn] DATETIME NULL,
         [ModifiedBy] NVARCHAR(256) NULL,
         [ModifiedOn] DATETIME NULL,
-        CONSTRAINT [PK_AlaWiki_WikiConnection] PRIMARY KEY CLUSTERED ([WikiConnectionId] ASC)
+        CONSTRAINT [PK_AlaWikiMindMap_WikiConnection] PRIMARY KEY CLUSTERED ([WikiConnectionId] ASC)
     )
 END
 GO
 
-IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_AlaWiki_WikiConnection_ModuleId')
+IF NOT EXISTS (SELECT * FROM sys.indexes WHERE name = 'IX_AlaWikiMindMap_WikiConnection_ModuleId')
 BEGIN
-    CREATE NONCLUSTERED INDEX [IX_AlaWiki_WikiConnection_ModuleId]
-    ON [dbo].[AlaWiki_WikiConnection] ([ModuleId] ASC)
+    CREATE NONCLUSTERED INDEX [IX_AlaWikiMindMap_WikiConnection_ModuleId]
+    ON [dbo].[AlaWikiMindMap_WikiConnection] ([ModuleId] ASC)
 END
 GO

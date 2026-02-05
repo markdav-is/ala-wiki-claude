@@ -4,11 +4,11 @@ using Oqtane.Controllers;
 using Oqtane.Enums;
 using Oqtane.Infrastructure;
 using Oqtane.Shared;
-using AlaWiki.Shared.Models;
-using AlaWiki.Server.Repository;
-using AlaWiki.Server.Services;
+using AlaWiki.Module.MindMap.Shared.Models;
+using AlaWiki.Module.MindMap.Server.Repository;
+using AlaWiki.Module.MindMap.Server.Services;
 
-namespace AlaWiki.Server.Controllers;
+namespace AlaWiki.Module.MindMap.Server.Controllers;
 
 [Route(ControllerRoutes.ApiRoute)]
 public class MindMapController : ModuleControllerBase

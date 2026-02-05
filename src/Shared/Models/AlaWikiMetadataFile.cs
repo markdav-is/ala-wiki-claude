@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace AlaWiki.Shared.Models;
+namespace AlaWiki.Module.MindMap.Shared.Models;
 
 /// <summary>
 /// Represents the .ala-wiki.json file structure (Option 2).

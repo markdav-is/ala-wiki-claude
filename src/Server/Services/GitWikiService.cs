@@ -1,11 +1,11 @@
 using System.Text.Json;
 using LibGit2Sharp;
 using Oqtane.Infrastructure;
-using AlaWiki.Shared.Models;
-using AlaWiki.Server.Repository;
+using AlaWiki.Module.MindMap.Shared.Models;
+using AlaWiki.Module.MindMap.Server.Repository;
 using Microsoft.Extensions.Logging;
 
-namespace AlaWiki.Server.Services;
+namespace AlaWiki.Module.MindMap.Server.Services;
 
 public interface IGitWikiService
 {

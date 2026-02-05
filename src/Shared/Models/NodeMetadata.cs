@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace AlaWiki.Shared.Models;
+namespace AlaWiki.Module.MindMap.Shared.Models;
 
 /// <summary>
 /// Visualization metadata for a single wiki page/node.

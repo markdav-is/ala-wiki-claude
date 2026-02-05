@@ -1,11 +1,11 @@
 using Microsoft.Extensions.DependencyInjection;
 using Oqtane.Services;
-using AlaWiki.Client.Services;
-using AlaWiki.Shared.Interfaces;
+using AlaWiki.Module.MindMap.Client.Services;
+using AlaWiki.Module.MindMap.Shared.Interfaces;
 
-namespace AlaWiki.Client;
+namespace AlaWiki.Module.MindMap.Client.Startup;
 
-public class Startup : IClientStartup
+public class ClientStartup : IClientStartup
 {
     public void ConfigureServices(IServiceCollection services)
     {

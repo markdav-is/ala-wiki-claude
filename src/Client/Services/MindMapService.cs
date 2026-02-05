@@ -1,10 +1,10 @@
 using System.Net.Http.Json;
-using AlaWiki.Shared.Interfaces;
-using AlaWiki.Shared.Models;
+using AlaWiki.Module.MindMap.Shared.Interfaces;
+using AlaWiki.Module.MindMap.Shared.Models;
 using Oqtane.Services;
 using Oqtane.Shared;
 
-namespace AlaWiki.Client.Services;
+namespace AlaWiki.Module.MindMap.Client.Services;
 
 public class MindMapService : ServiceBase, IMindMapService
 {

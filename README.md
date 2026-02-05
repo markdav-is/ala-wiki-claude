@@ -1,6 +1,8 @@
-# AlaWiki
+# AlaWiki MindMap
 
 A mind-mapping extension for Azure DevOps wikis, built as an Oqtane Module in Blazor.
+
+Built with the Oqtane 10.0 Application Template for .NET 10.
 
 ## Features
 
@@ -14,25 +16,31 @@ A mind-mapping extension for Azure DevOps wikis, built as an Oqtane Module in Bl
 
 ```
 src/
-├── AlaWiki.sln              # Solution file
-├── Client/                   # Blazor WebAssembly client
-│   ├── Modules/AlaWiki/     # Razor components
-│   │   ├── Index.razor      # Main mind map viewer
-│   │   ├── Edit.razor       # Wiki connection management
-│   │   ├── Settings.razor   # Display settings
-│   │   ├── MindMapView.razor# Recursive node renderer
-│   │   └── NodeDetails.razor# Node metadata editor
-│   └── Services/            # Client-side API services
-├── Server/                   # ASP.NET Core server
-│   ├── Controllers/         # API endpoints
-│   ├── Services/            # Git and mind map services
-│   ├── Repository/          # Data access layer
-│   ├── Manager/             # Module lifecycle manager
-│   └── Migrations/          # SQL migration scripts
-├── Shared/                   # Shared models and interfaces
-│   ├── Models/              # Data models
-│   └── Interfaces/          # Service contracts
-└── Package/                  # NuGet/Oqtane packaging
+├── AlaWiki.Module.MindMap.slnx     # Solution file (.NET 10 slnx format)
+├── Client/                          # Blazor WebAssembly client
+│   ├── Modules/AlaWiki.Module.MindMap/
+│   │   ├── ModuleInfo.cs           # Module registration
+│   │   ├── Index.razor             # Main mind map viewer
+│   │   ├── Edit.razor              # Wiki connection management
+│   │   ├── Settings.razor          # Display settings
+│   │   ├── MindMapView.razor       # Recursive node renderer
+│   │   └── NodeDetails.razor       # Node metadata editor
+│   ├── Services/                   # Client-side API services
+│   ├── Startup/                    # DI registration
+│   └── Resources/                  # CSS and localization
+├── Server/                          # ASP.NET Core server
+│   ├── Controllers/                # API endpoints
+│   ├── Services/                   # Git and mind map services
+│   ├── Repository/                 # EF Core data access
+│   ├── Manager/                    # Module lifecycle manager
+│   ├── Startup/                    # Server DI registration
+│   └── Migrations/                 # SQL migration scripts
+├── Shared/                          # Shared models and interfaces
+│   ├── Models/                     # Data models
+│   └── Interfaces/                 # Service contracts
+└── Package/                         # Oqtane packaging
+    ├── debug.cmd / debug.sh        # Debug deployment scripts
+    └── release.cmd / release.sh    # Package creation scripts
 ```
 
 ## Metadata Format (Option 2)
@@ -75,11 +83,11 @@ Visualization metadata is stored in `.ala-wiki.json` files alongside wiki conten
 
 ## Installation
 
-### From NuGet Package
+### From Oqtane Package
 
 1. Build in Release mode to generate the `.oqp` package
 2. In Oqtane admin, go to Module Management
-3. Upload the `AlaWiki.x.x.x.oqp` file
+3. Upload the `AlaWiki.Module.MindMap.1.0.0.oqp` file
 4. Click Install
 
 ### From Source
@@ -91,7 +99,7 @@ dotnet build
 
 ## Configuration
 
-1. Add the AlaWiki module to a page in Oqtane
+1. Add the AlaWiki MindMap module to a page in Oqtane
 2. Click "Configure Wiki Connection" or use Edit mode
 3. Enter your Azure DevOps wiki Git URL:
    - Format: `https://dev.azure.com/{org}/{project}/_git/{project}.wiki`
@@ -114,7 +122,18 @@ cd src
 dotnet build -c Release
 ```
 
-The `.oqp` file will be in `Package/bin/Release/net10.0/`
+The `.oqp` file will be created in `Package/bin/Release/net10.0/`
+
+### Development with Oqtane
+
+For local development, update the `oqtanepath` variable in `Package/debug.cmd` (Windows) or `Package/debug.sh` (Linux/macOS) to point to your Oqtane installation's bin folder. Debug builds will automatically copy assemblies.
+
+## Assembly Names
+
+Following Oqtane 10.0 naming conventions:
+- `AlaWiki.Module.MindMap.Client.Oqtane`
+- `AlaWiki.Module.MindMap.Server.Oqtane`
+- `AlaWiki.Module.MindMap.Shared.Oqtane`
 
 ## License
 

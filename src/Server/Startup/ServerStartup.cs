@@ -1,15 +1,15 @@
 using Microsoft.Extensions.DependencyInjection;
 using Oqtane.Infrastructure;
-using AlaWiki.Server.Repository;
-using AlaWiki.Server.Services;
+using AlaWiki.Module.MindMap.Server.Repository;
+using AlaWiki.Module.MindMap.Server.Services;
 
-namespace AlaWiki.Server;
+namespace AlaWiki.Module.MindMap.Server.Startup;
 
-public class Startup : IServerStartup
+public class ServerStartup : IServerStartup
 {
     public void ConfigureServices(IServiceCollection services)
     {
-        services.AddTransient<AlaWikiContext>();
+        services.AddTransient<MindMapContext>();
         services.AddTransient<IWikiConnectionRepository, WikiConnectionRepository>();
         services.AddTransient<IGitWikiService, GitWikiService>();
         services.AddTransient<IMindMapGenerator, MindMapGenerator>();

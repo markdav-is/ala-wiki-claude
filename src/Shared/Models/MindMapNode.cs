@@ -1,4 +1,4 @@
-namespace AlaWiki.Shared.Models;
+namespace AlaWiki.Module.MindMap.Shared.Models;
 
 /// <summary>
 /// Represents a node in the mind map visualization.

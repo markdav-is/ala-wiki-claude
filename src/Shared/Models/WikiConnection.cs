@@ -1,7 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using Oqtane.Models;
 
-namespace AlaWiki.Shared.Models;
+namespace AlaWiki.Module.MindMap.Shared.Models;
 
 /// <summary>
 /// Represents a connection to an Azure DevOps wiki Git repository.
